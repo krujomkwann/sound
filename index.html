@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Physics Sound Bingo - ม.5 เรื่อง เสียง</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f4f6ff',
+                            100: '#eef2ff',
+                            400: '#818cf8',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        },
+                        pastel: {
+                            pink: '#f472b6',
+                            pinkLight: '#fdf2f8',
+                            purple: '#c084fc',
+                            purpleLight: '#faf5ff',
+                            cyan: '#38bdf8',
+                            cyanLight: '#f0f9ff',
+                            amber: '#fbbf24',
+                            amberLight: '#fffbeb',
+                            emerald: '#34d399',
+                            emeraldLight: '#ecfdf5'
+                        }
+                    },
+                    fontFamily: {
+                        prompt: ['Prompt', 'sans-serif'],
+                        mitr: ['Mitr', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        .font-title {
+            font-family: 'Mitr', sans-serif;
+        }
+
+        .cell-locked {
+            cursor: not-allowed !important;
+            animation: lockPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes lockPop {
+            0% { transform: scale(0.92); }
+            50% { transform: scale(1.04); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse-glow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            50% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+    </style>
+</head>
+<body class="min-h-screen text-slate-800 flex flex-col justify-between">
+
+    <!-- HEADER / ROLE SWITCHER -->
+    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200 shadow-sm">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-500 to-pastel-purple flex items-center justify-center text-white text-xl shadow-md transform -rotate-3">
+                    <i class="fa-solid fa-wave-square"></i>
+                </div>
+                <div>
+                    <h1 class="text-base md:text-lg font-bold text-slate-900 font-title flex items-center gap-2">
+                        Physics Sound Bingo 🔊
+                    </h1>
+                    <p class="text-xs text-brand-600 font-medium">ฟิสิกส์ ม.5 • เรื่อง เสียง</p>
+                </div>
+            </div>
+
+            <!-- Role Selector -->
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+                <button onclick="switchRole('student')" id="btn-role-student" class="px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 bg-white text-brand-600 shadow-sm">
+                    <i class="fa-solid fa-user-graduate"></i> นักเรียน
+                </button>
+                <button onclick="switchRole('teacher')" id="btn-role-teacher" class="px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 text-slate-600 hover:text-brand-600">
+                    <i class="fa-solid fa-chalkboard-user"></i> คุณครู (Host)
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-4xl mx-auto px-4 py-6 flex-1 w-full">
+
+        <!-- ================= STUDENT ROLE ================= -->
+        <section id="student-section" class="space-y-6">
+            
+            <!-- Login Card -->
+            <div id="student-login-card" class="max-w-md mx-auto bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-slate-100 text-center space-y-5">
+                <div class="w-16 h-16 bg-brand-50 text-brand-600 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner">
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold font-title text-slate-800">เข้าสู่ใบบิงโกของคุณ</h2>
+                    <p class="text-xs text-slate-500 mt-1">กรอกรหัสห้อง ชื่อ และเลือกเลขที่เพื่อสร้างตารางเฉพาะตัว</p>
+                </div>
+
+                <div class="space-y-4 text-left text-sm">
+                    <div>
+                        <label class="font-semibold text-slate-700 block mb-1">รหัสห้องเรียน (Room Code):</label>
+                        <input type="text" id="stu-room-input" placeholder="เช่น M501" value="M501" class="w-full bg-slate-50 border border-slate-200 font-bold text-brand-600 rounded-xl px-4 py-2.5 uppercase outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100">
+                    </div>
+                    <div>
+                        <label class="font-semibold text-slate-700 block mb-1">เลือกเลขที่ประจำตัว (1 - 40):</label>
+                        <select id="stu-no-input" class="w-full bg-slate-50 border border-slate-200 font-bold text-slate-700 rounded-xl px-4 py-2.5 outline-none focus:border-brand-500">
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-semibold text-slate-700 block mb-1">ชื่อ - นามสกุล:</label>
+                        <input type="text" id="stu-name-input" placeholder="นายฟิสิกส์ เก่งมาก" value="นักเรียนทดสอบ" class="w-full bg-slate-50 border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 outline-none focus:border-brand-500">
+                    </div>
+                </div>
+
+                <button onclick="startStudentGame()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> เปิดกระดานบิงโกเข้าเล่น
+                </button>
+            </div>
+
+            <!-- Student Board Display -->
+            <div id="student-board-card" class="hidden max-w-xl mx-auto space-y-4">
+                
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-700 font-bold flex items-center justify-center text-sm">
+                            <span id="display-stu-no">#1</span>
+                        </div>
+                        <div>
+                            <h3 id="display-stu-name" class="font-bold text-slate-800 text-sm md:text-base">นักเรียน</h3>
+                            <p id="display-stu-room" class="text-xs text-slate-500">ห้อง: M501</p>
+                        </div>
+                    </div>
+                    <button onclick="resetStudentLogin()" class="text-xs text-slate-500 hover:text-rose-600 font-semibold px-3 py-1.5 rounded-lg border border-slate-200 hover:border-rose-200 transition">
+                        <i class="fa-solid fa-arrows-rotate mr-1"></i> เปลี่ยนห้อง/เลขที่
+                    </button>
+                </div>
+
+                <!-- Bingo Grid Container -->
+                <div class="bg-white rounded-3xl p-4 md:p-6 shadow-xl border border-slate-100 relative">
+                    
+                    <div class="flex justify-between items-center mb-3 text-xs font-semibold text-slate-500">
+                        <span><i class="fa-solid fa-lock text-pink-500 mr-1"></i> กดเลือกช่องแล้วจะล็อกถาวร</span>
+                        <span id="card-seed-badge" class="bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded-full font-mono">SEED: M501-1</span>
+                    </div>
+
+                    <!-- B I N G O Header -->
+                    <div class="grid grid-cols-5 gap-1.5 md:gap-2 mb-2 text-center font-title font-bold text-base md:text-xl text-white">
+                        <div class="bg-brand-500 py-1.5 rounded-xl shadow-sm">B</div>
+                        <div class="bg-pastel-purple py-1.5 rounded-xl shadow-sm">I</div>
+                        <div class="bg-pastel-cyan py-1.5 rounded-xl shadow-sm">N</div>
+                        <div class="bg-pastel-emerald py-1.5 rounded-xl shadow-sm">G</div>
+                        <div class="bg-pastel-amber py-1.5 rounded-xl shadow-sm">O</div>
+                    </div>
+
+                    <!-- 5x5 Grid -->
+                    <div id="bingo-grid" class="grid grid-cols-5 gap-1.5 md:gap-2">
+                    </div>
+
+                    <!-- Winner Banner -->
+                    <div id="bingo-banner" class="hidden mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-4 text-center font-title font-bold text-base md:text-lg shadow-lg animate-bounce">
+                        🎉 BINGO! ยินดีด้วย คุณทำสำเร็จแล้ว! 🎉
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ================= TEACHER ROLE ================= -->
+        <section id="teacher-section" class="hidden space-y-6">
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Question Drawer Box -->
+                <div class="md:col-span-2 bg-white rounded-3xl p-6 shadow-xl border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
+                                <i class="fa-solid fa-bullhorn mr-1"></i> แท่นสุ่มคำถาม
+                            </span>
+                            <span id="drawn-count-badge" class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                ออกแล้ว 0 / 25 ข้อ
+                            </span>
+                        </div>
+
+                        <!-- Question Box -->
+                        <div class="min-h-[170px] bg-slate-50 rounded-2xl p-6 border border-slate-200 flex flex-col justify-center items-center text-center relative">
+                            <h2 id="host-q-text" class="text-base md:text-xl font-bold text-slate-800">
+                                🎲 พร้อมหรือยัง? กดปุ่ม "สุ่มคำถามถัดไป" เพื่อจับฉลากคำถาม
+                            </h2>
+
+                            <div id="host-a-box" class="mt-4 pt-3 border-t border-slate-200 w-full hidden">
+                                <span class="text-xs text-slate-400 font-semibold uppercase">คำตอบ (สำหรับลงช่องบิงโก):</span>
+                                <div id="host-a-text" class="text-lg md:text-2xl font-bold text-brand-600 mt-0.5">
+                                    -
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Host Controls -->
+                    <div class="flex flex-wrap gap-3 mt-6">
+                        <button onclick="drawNextQuestion()" id="btn-draw" class="flex-1 bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-5 rounded-xl shadow-lg shadow-brand-500/25 transition flex items-center justify-center gap-2 pulse-glow text-sm md:text-base">
+                            <i class="fa-solid fa-dice text-lg"></i> สุ่มคำถามถัดไป
+                        </button>
+                        
+                        <button onclick="toggleAnswerShow()" id="btn-toggle-a" disabled class="bg-amber-100 hover:bg-amber-200 text-amber-800 font-bold py-3.5 px-4 rounded-xl transition flex items-center gap-2 text-sm opacity-50 cursor-not-allowed">
+                            <i class="fa-solid fa-eye" id="eye-icon"></i> <span id="answer-btn-label">เฉลย</span>
+                        </button>
+
+                        <button onclick="resetTeacherDraw()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3.5 px-4 rounded-xl transition text-sm" title="เริ่มจับฉลากใหม่">
+                            <i class="fa-solid fa-rotate-right"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- History Log -->
+                <div class="bg-white rounded-3xl p-5 shadow-xl border border-slate-100 flex flex-col h-[380px]">
+                    <h3 class="font-bold text-slate-800 text-sm mb-3 flex justify-between items-center">
+                        <span><i class="fa-solid fa-history text-brand-500 mr-1.5"></i>ประวัติคำถาม</span>
+                        <span id="history-count" class="text-xs bg-brand-100 text-brand-700 font-bold px-2 py-0.5 rounded-full">0</span>
+                    </h3>
+                    <div id="history-log" class="flex-1 overflow-y-auto space-y-2 pr-1">
+                        <div class="text-center text-slate-400 text-xs py-14 italic">
+                            ยังไม่มีคำถามที่ถูกสุ่มออก
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LIVE BINGO CHECKER TOOL -->
+            <div class="bg-white rounded-3xl p-6 shadow-xl border border-slate-100 space-y-4">
+                <div class="flex flex-wrap justify-between items-center gap-3">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass-chart text-emerald-500"></i> ตรวจกระดานบิงโกผู้ชนะ
+                        </h3>
+                        <p class="text-xs text-slate-500">ระบุรหัสห้องและเลขที่นักเรียน เพื่อจำลองเปิดดูลายกระดานจริง</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold text-slate-600">รหัสห้อง:</span>
+                            <input type="text" id="check-room-input" oninput="inspectStudentCard()" value="M501" class="w-24 bg-slate-50 border border-slate-200 font-bold text-slate-800 text-xs rounded-lg px-2.5 py-1.5 uppercase outline-none focus:border-brand-500">
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-xs font-semibold text-slate-600">เลขที่:</span>
+                            <select id="check-no-input" onchange="inspectStudentCard()" class="bg-slate-50 border border-slate-200 font-bold text-slate-800 text-xs rounded-lg px-2.5 py-1.5 outline-none focus:border-brand-500">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200">
+                    <div class="flex justify-between items-center mb-3 text-xs font-semibold text-slate-600 border-b pb-2">
+                        <span id="checker-card-title">ใบบิงโกประจำเลขที่ #1</span>
+                        <div class="flex items-center gap-3 text-[11px]">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-400 rounded-full inline-block"></span> ตรงคำตอบแล้ว</span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-white border border-slate-300 rounded-full inline-block"></span> ยังไม่ออก</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-1.5 mb-1 text-center font-title font-bold text-xs text-white">
+                        <div class="bg-brand-500 rounded py-1">B</div>
+                        <div class="bg-pastel-purple rounded py-1">I</div>
+                        <div class="bg-pastel-cyan rounded py-1">N</div>
+                        <div class="bg-pastel-emerald rounded py-1">G</div>
+                        <div class="bg-pastel-amber rounded py-1">O</div>
+                    </div>
+                    <div id="checker-grid" class="grid grid-cols-5 gap-1.5">
+                    </div>
+
+                    <div id="checker-status" class="mt-3 p-2.5 rounded-xl text-center text-xs font-bold">
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-4 text-center text-xs text-slate-400">
+        <p>Physics Sound Bingo Application • พัฒนาขึ้นสำหรับการเรียนการสอนเรื่อง เสียง ชั้น ม.5</p>
+    </footer>
+
+    <!-- AUDIO EFFECTS -->
+    <script>
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playStampSound() {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(350, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(700, audioCtx.currentTime + 0.08);
+                gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.08);
+            } catch(e) {}
+        }
+
+        function playFanfare() {
+            try {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+                    gain.gain.setValueAtTime(0.3, audioCtx.currentTime + idx * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + idx * 0.1 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(audioCtx.currentTime + idx * 0.1);
+                    osc.stop(audioCtx.currentTime + idx * 0.1 + 0.3);
+                });
+            } catch(e) {}
+        }
+    </script>
+
+    <!-- MAIN LOGIC -->
+    <script>
+        // 25 Sound Terms & Questions
+        const QUESTIONS = [
+            { id: 1, q: "ชนิดของคลื่นเสียงที่ต้องอาศัยตัวกลาง และทิศทางการสั่นของอนุภาคขนานกับการเคลื่อนที่", a: "คลื่นกลตามยาว" },
+            { id: 2, q: "สิ่งที่เสียงต้องอาศัยในการเดินทาง โดยเสียงผ่านสุญญากาศไม่ได้", a: "ตัวกลาง" },
+            { id: 3, q: "อัตราเร็วของเสียงในอากาศที่อุณหภูมิประมาณ 20°C (หน่วย m/s)", a: "343 m/s" },
+            { id: 4, q: "ปรากฏการณ์ที่เสียงตกกระทบสิ่งกีดขวางแล้วเดินทางกลับออกมา", a: "การสะท้อน" },
+            { id: 5, q: "เสียงที่สะท้อนกลับมาหลังจากเสียงเดิม โดยห่างกันอย่างน้อย 0.1 วินาที", a: "เสียงสะท้อน (Echo)" },
+            { id: 6, q: "การสะท้อนของเสียงกลับไปกลับมาในห้องจนฟังไม่ค่อยรู้ความ", a: "ความกังวาน" },
+            { q: "ปรากฏการณ์ที่เสียงเดินทางผ่านตัวกลางต่างชนิดกัน ทำให้อัตราเร็วเปลี่ยนไป", a: "การหักเห" },
+            { id: 8, q: "ปรากฏการณ์ที่คลื่นเสียงมารวมกันเกิดจุดเสียงดัง (ปฏิบัพ) และเบา (บัพ)", a: "การแทรกสอด" },
+            { id: 9, q: "ปรากฏการณ์ที่เสียงเคลื่อนที่อ้อมสิ่งกีดขวางหรือผ่านช่องแคบได้", a: "การเลี้ยวเบน" },
+            { id: 10, q: "ความถี่ใกล้เคียงกันรวมกันได้ยินเสียงดัง-เบาสลับกันเป็นจังหวะ", a: "บีตส์ (Beats)" },
+            { id: 11, q: "ความถี่ในการสั่นของวัตถุเมื่อถูกทำให้สั่นอย่างอิสระ", a: "ความถี่ธรรมชาติ" },
+            { id: 12, q: "กระตุ้นวัตถุด้วยความถี่ธรรมชาติทำให้วัตถุสั่นด้วยแอมพลิจูดสูงสุด", a: "การกำทอน" },
+            { id: 13, q: "การเปลี่ยนแปลงความถี่เสียงเมื่อแหล่งกำเนิดหรือผู้ฟังเคลื่อนที่", a: "ดอปเพลอร์" },
+            { id: 14, q: "คลื่นที่เกิดขึ้นเมื่อแหล่งกำเนิดเคลื่อนที่เร็วมากกว่าความเร็วเสียง", a: "คลื่นกระแทก" },
+            { id: 15, q: "เสียงดังคล้ายระเบิดเมื่อวัตถุเคลื่อนที่ด้วยความเร็วเหนือเสียง", a: "Sonic Boom" },
+            { id: 16, q: "กำลังของคลื่นเสียงที่ส่งออกมาต่อหนึ่งหน่วยพื้นที่ (W/m²)", a: "ความเข้มเสียง" },
+            { id: 17, q: "หน่วยสเกลที่ใช้วัดระดับความดังของเสียง", a: "เดซิเบล (dB)" },
+            { id: 18, q: "ลักษณะของเสียงทุ้มหรือเสียงแหลม ขึ้นอยู่กับความถี่ของคลื่นเสียง", a: "ระดับเสียง" },
+            { id: 19, q: "คลื่นเสียงที่มีความถี่สูงกว่า 20,000 Hz ซึ่งมนุษย์ไม่ได้ยิน", a: "อัลตราซาวนด์" },
+            { id: 20, q: "คลื่นเสียงที่มีความถี่ต่ำกว่า 20 Hz ซึ่งต่ำกว่าหูมนุษย์รับรู้", a: "อินฟราซาวนด์" },
+            { id: 21, q: "โครงสร้างหูชั้นนอกที่ทำหน้าที่สั่นสะเทือนเมื่อได้รับคลื่นเสียง", a: "เยื่อแก้วหู" },
+            { id: 22, q: "อวัยวะรูปก้นหอยในหูชั้นใน เปลี่ยนการสั่นเป็นสัญญาณประสาท", a: "หอยโข่ง (Cochlea)" },
+            { id: 23, q: "สภาพแวดล้อมที่มีเสียงดังเกิน 85 dB เป็นเวลานานจนอันตราย", a: "มลภาวะทางเสียง" },
+            { id: 24, q: "อุปกรณ์กำทอนเปิดสองด้าน ให้คลื่นมูลฐาน λ = 2L", a: "ท่อปลายเปิด" },
+            { id: 25, q: "อุปกรณ์กำทอนปิดหนึ่งด้าน เปิดหนึ่งด้าน ให้คลื่นมูลฐาน λ = 4L", a: "ท่อปลายปิด" }
+        ];
+
+        // State Variables
+        let currentRoom = 'M501';
+        let studentNo = 1;
+        let studentName = '';
+        let studentCardState = [];
+
+        let remainingQ = [...QUESTIONS];
+        let drawnQHistory = [];
+        let activeQ = null;
+        let isShowAnswer = false;
+
+        window.onload = function() {
+            populateStudentDropdowns();
+        };
+
+        function populateStudentDropdowns() {
+            const selectStu = document.getElementById('stu-no-input');
+            const selectCheck = document.getElementById('check-no-input');
+            selectStu.innerHTML = '';
+            selectCheck.innerHTML = '';
+
+            for (let i = 1; i <= 40; i++) {
+                let opt1 = document.createElement('option');
+                opt1.value = i;
+                opt1.textContent = `เลขที่ ${i}`;
+                selectStu.appendChild(opt1);
+
+                let opt2 = document.createElement('option');
+                opt2.value = i;
+                opt2.textContent = `เลขที่ ${i}`;
+                selectCheck.appendChild(opt2);
+            }
+        }
+
+        function switchRole(role) {
+            document.getElementById('student-section').classList.toggle('hidden', role !== 'student');
+            document.getElementById('teacher-section').classList.toggle('hidden', role !== 'teacher');
+
+            document.getElementById('btn-role-student').className = role === 'student'
+                ? "px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 bg-white text-brand-600 shadow-sm"
+                : "px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 text-slate-600 hover:text-brand-600";
+
+            document.getElementById('btn-role-teacher').className = role === 'teacher'
+                ? "px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 bg-white text-brand-600 shadow-sm"
+                : "px-4 py-2 rounded-lg transition duration-200 flex items-center gap-1.5 text-slate-600 hover:text-brand-600";
+
+            if (role === 'teacher') {
+                inspectStudentCard();
+            }
+        }
+
+        // ================= STUDENT LOGIC =================
+
+        function startStudentGame() {
+            const roomVal = document.getElementById('stu-room-input').value.trim().toUpperCase() || 'M501';
+            const noVal = parseInt(document.getElementById('stu-no-input').value);
+            const nameVal = document.getElementById('stu-name-input').value.trim();
+
+            if (!nameVal) {
+                alert("กรุณากรอกชื่อ-นามสกุลก่อนเข้าเล่นครับ");
+                return;
+            }
+
+            currentRoom = roomVal;
+            studentNo = noVal;
+            studentName = nameVal;
+
+            document.getElementById('student-login-card').classList.add('hidden');
+            document.getElementById('student-board-card').classList.remove('hidden');
+
+            document.getElementById('display-stu-no').innerText = `#${studentNo}`;
+            document.getElementById('display-stu-name').innerText = studentName;
+            document.getElementById('display-stu-room').innerText = `ห้อง: ${currentRoom}`;
+            document.getElementById('card-seed-badge').innerText = `SEED: ${currentRoom}-${studentNo}`;
+
+            studentCardState = generateBoardLayout(currentRoom, studentNo);
+            renderStudentBoard();
+        }
+
+        function generateBoardLayout(roomStr, rollNum) {
+            let hash = 0;
+            const seedStr = `${roomStr.trim().toUpperCase()}_#${rollNum}`;
+            for (let i = 0; i < seedStr.length; i++) {
+                hash = (hash << 5) - hash + seedStr.charCodeAt(i);
+                hash |= 0;
+            }
+
+            let terms = QUESTIONS.map(q => q.a);
+            let currentSeed = Math.abs(hash * 37 + rollNum * 13 + 7);
+
+            // Seeded Fisher-Yates Shuffle
+            for (let i = terms.length - 1; i > 0; i--) {
+                currentSeed = (currentSeed * 9301 + 49297) % 233280;
+                let rnd = currentSeed / 233280;
+                let j = Math.floor(rnd * (i + 1));
+                let temp = terms[i];
+                terms[i] = terms[j];
+                terms[j] = temp;
+            }
+
+            let grid = [];
+            let termIndex = 0;
+
+            for (let i = 0; i < 25; i++) {
+                if (i === 12) {
+                    grid.push({ isFree: true, marked: true, text: "FREE ⭐" });
+                } else {
+                    grid.push({ isFree: false, marked: false, text: terms[termIndex] });
+                    termIndex++;
+                }
+            }
+            return grid;
+        }
+
+        function renderStudentBoard() {
+            const gridEl = document.getElementById('bingo-grid');
+            gridEl.innerHTML = studentCardState.map((cell, idx) => `
+                <button 
+                    onclick="clickStudentCell(${idx})"
+                    ${cell.marked ? 'disabled' : ''}
+                    class="h-16 md:h-20 p-1.5 rounded-2xl border text-center flex flex-col items-center justify-center transition-all duration-200 relative select-none ${
+                        cell.isFree
+                            ? 'bg-amber-100 border-amber-300 text-amber-900 font-bold cell-locked shadow-inner'
+                            : cell.marked
+                                ? 'bg-pink-100 border-pink-400 text-pink-900 font-bold cell-locked shadow-sm'
+                                : 'bg-white border-slate-200 hover:border-brand-400 hover:bg-brand-50/50 text-slate-700 active:scale-95'
+                    }">
+                    <span class="text-[11px] md:text-xs leading-tight font-medium">${cell.text}</span>
+                    ${cell.marked && !cell.isFree ? `
+                        <div class="absolute inset-0 bg-pink-500/10 rounded-2xl flex items-center justify-center border-2 border-pink-500">
+                            <span class="bg-pink-600 text-white text-[9px] md:text-[10px] px-1.5 py-0.5 rounded font-bold shadow flex items-center gap-1">
+                                <i class="fa-solid fa-lock"></i> ล็อก
+                            </span>
+                        </div>
+                    ` : ''}
+                </button>
+            `).join('');
+        }
+
+        function clickStudentCell(idx) {
+            if (studentCardState[idx].marked) return;
+            studentCardState[idx].marked = true;
+            playStampSound();
+            renderStudentBoard();
+            checkStudentBingoState();
+        }
+
+        function checkStudentBingoState() {
+            const b = studentCardState.map(c => c.marked);
+            let isBingo = false;
+
+            for (let r = 0; r < 5; r++) {
+                if (b[r*5] && b[r*5+1] && b[r*5+2] && b[r*5+3] && b[r*5+4]) isBingo = true;
+            }
+            for (let c = 0; c < 5; c++) {
+                if (b[c] && b[c+5] && b[c+10] && b[c+15] && b[c+20]) isBingo = true;
+            }
+            if (b[0] && b[6] && b[12] && b[18] && b[24]) isBingo = true;
+            if (b[4] && b[8] && b[12] && b[16] && b[20]) isBingo = true;
+
+            const banner = document.getElementById('bingo-banner');
+            if (isBingo && banner.classList.contains('hidden')) {
+                banner.classList.remove('hidden');
+                playFanfare();
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        function resetStudentLogin() {
+            if (confirm("ต้องการเปลี่ยนรหัสห้องหรือเลขที่ใช่หรือไม่?")) {
+                document.getElementById('student-board-card').classList.add('hidden');
+                document.getElementById('student-login-card').classList.remove('hidden');
+                document.getElementById('bingo-banner').classList.add('hidden');
+            }
+        }
+
+        // ================= TEACHER LOGIC =================
+
+        function drawNextQuestion() {
+            if (remainingQ.length === 0) {
+                alert("สุ่มคำถามครบทั้งหมด 25 ข้อแล้วครับ!");
+                return;
+            }
+
+            const randIdx = Math.floor(Math.random() * remainingQ.length);
+            activeQ = remainingQ.splice(randIdx, 1)[0];
+            drawnQHistory.unshift(activeQ);
+
+            isShowAnswer = false;
+            document.getElementById('host-a-box').classList.add('hidden');
+            document.getElementById('answer-btn-label').innerText = "เฉลย";
+            document.getElementById('eye-icon').className = "fa-solid fa-eye";
+            document.getElementById('btn-toggle-a').disabled = false;
+            document.getElementById('btn-toggle-a').classList.remove('opacity-50', 'cursor-not-allowed');
+
+            document.getElementById('host-q-text').innerText = `❓ "${activeQ.q}"`;
+            document.getElementById('host-a-text').innerText = activeQ.a;
+
+            document.getElementById('drawn-count-badge').innerText = `ออกแล้ว ${drawnQHistory.length} / ${QUESTIONS.length} ข้อ`;
+
+            renderTeacherHistory();
+            inspectStudentCard();
+        }
+
+        function toggleAnswerShow() {
+            if (!activeQ) return;
+            isShowAnswer = !isShowAnswer;
+            const box = document.getElementById('host-a-box');
+            if (isShowAnswer) {
+                box.classList.remove('hidden');
+                document.getElementById('answer-btn-label').innerText = "ซ่อนเฉลย";
+                document.getElementById('eye-icon').className = "fa-solid fa-eye-slash";
+            } else {
+                box.classList.add('hidden');
+                document.getElementById('answer-btn-label').innerText = "เฉลย";
+                document.getElementById('eye-icon').className = "fa-solid fa-eye";
+            }
+        }
+
+        function renderTeacherHistory() {
+            const listEl = document.getElementById('history-log');
+            document.getElementById('history-count').innerText = drawnQHistory.length;
+
+            if (drawnQHistory.length === 0) {
+                listEl.innerHTML = `<div class="text-center text-slate-400 text-xs py-14 italic">ยังไม่มีคำถามที่ถูกสุ่มออก</div>`;
+                return;
+            }
+
+            listEl.innerHTML = drawnQHistory.map((item, idx) => `
+                <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
+                    <div class="flex items-center gap-2">
+                        <span class="w-5 h-5 rounded-full bg-brand-600 text-white font-bold flex items-center justify-center text-[10px]">
+                            ${drawnQHistory.length - idx}
+                        </span>
+                        <p class="font-bold text-brand-600">${item.a}</p>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-1 truncate">${item.q}</p>
+                </div>
+            `).join('');
+        }
+
+        function inspectStudentCard() {
+            const roomVal = document.getElementById('check-room-input').value.trim().toUpperCase() || 'M501';
+            const noVal = parseInt(document.getElementById('check-no-input').value);
+
+            document.getElementById('checker-card-title').innerText = `📋 จำลองกระดาน [ห้อง ${roomVal}] • เลขที่ #${noVal}`;
+
+            const generatedLayout = generateBoardLayout(roomVal, noVal);
+            const drawnAnswersSet = new Set(drawnQHistory.map(q => q.a));
+            
+            const isMatch = generatedLayout.map(cell => cell.isFree || drawnAnswersSet.has(cell.text));
+
+            const gridEl = document.getElementById('checker-grid');
+            gridEl.innerHTML = generatedLayout.map((cell, idx) => {
+                const matched = isMatch[idx];
+                return `
+                    <div class="h-12 p-1 rounded-xl border text-center flex flex-col items-center justify-center relative ${
+                        cell.isFree
+                            ? 'bg-amber-100 border-amber-300 text-amber-900 font-bold'
+                            : matched 
+                                ? 'bg-emerald-100 border-emerald-400 text-emerald-900 font-bold shadow-xs' 
+                                : 'bg-white border-slate-200 text-slate-500'
+                    }">
+                        <span class="text-[10px] leading-tight font-medium">${cell.text}</span>
+                        ${matched && !cell.isFree ? '<span class="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full"></span>' : ''}
+                    </div>
+                `;
+            }).join('');
+
+            let hasBingo = false;
+            for (let r = 0; r < 5; r++) {
+                if (isMatch[r*5] && isMatch[r*5+1] && isMatch[r*5+2] && isMatch[r*5+3] && isMatch[r*5+4]) hasBingo = true;
+            }
+            for (let c = 0; c < 5; c++) {
+                if (isMatch[c] && isMatch[c+5] && isMatch[c+10] && isMatch[c+15] && isMatch[c+20]) hasBingo = true;
+            }
+            if (isMatch[0] && isMatch[6] && isMatch[12] && isMatch[18] && isMatch[24]) hasBingo = true;
+            if (isMatch[4] && isMatch[8] && isMatch[12] && isMatch[16] && isMatch[20]) hasBingo = true;
+
+            const statusEl = document.getElementById('checker-status');
+            if (hasBingo) {
+                statusEl.className = "mt-3 p-2.5 rounded-xl text-center text-xs font-bold bg-emerald-100 border border-emerald-300 text-emerald-800";
+                statusEl.innerHTML = `✅ ผลการตรวจ: **ห้อง ${roomVal} เลขที่ ${noVal} บิงโกถูกต้องเรียบร้อยแล้ว!** 🎉`;
+            } else {
+                statusEl.className = "mt-3 p-2.5 rounded-xl text-center text-xs font-bold bg-amber-50 border border-amber-200 text-amber-700";
+                statusEl.innerHTML = `⏳ ผลการตรวจ: ห้อง ${roomVal} เลขที่ ${noVal} ยังไม่ครบบรรทัดบิงโกตามคำตอบที่สุ่มออก`;
+            }
+        }
+
+        function resetTeacherDraw() {
+            if (confirm("ต้องการเริ่มจับฉลากคำถามใหม่ใช่หรือไม่?")) {
+                remainingQ = [...QUESTIONS];
+                drawnQHistory = [];
+                activeQ = null;
+                isShowAnswer = false;
+
+                document.getElementById('host-q-text').innerText = '🎲 พร้อมหรือยัง? กดปุ่ม "สุ่มคำถามถัดไป" เพื่อจับฉลากคำถาม';
+                document.getElementById('host-a-box').classList.add('hidden');
+                document.getElementById('btn-toggle-a').disabled = true;
+                document.getElementById('btn-toggle-a').classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('drawn-count-badge').innerText = `ออกแล้ว 0 / ${QUESTIONS.length} ข้อ`;
+
+                renderTeacherHistory();
+                inspectStudentCard();
+            }
+        }
+    </script>
+</body>
+</html>
